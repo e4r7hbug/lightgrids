@@ -23,11 +23,11 @@ class Petal:
         self.dead = not bool(self.brightness)
         return self.brightness
 
-    def draw(self, display: Display):
+    def draw(self, display: Display, frame: int = 0):
         if (self.x > display.width) or (self.y > display.height):
             self.dead = True
             return
-        display.pixel(self.x, self.y, self.brightness)
+        display.pixel(self.x, self.y, self.brightness, frame=frame)
 
 
 class Edge:
@@ -177,10 +177,10 @@ class Layer:
         """Remove dead petals."""
         self.petals = [petal for petal in self.petals if not petal.dead]
 
-    def draw(self, display: Display):
+    def draw(self, display: Display, frame: int = 0):
         """Draw petals on dispaly."""
         for petal in self.petals:
-            petal.draw(display)
+            petal.draw(display, frame=frame)
 
     def decay(self):
         """Fading petals."""
@@ -271,12 +271,12 @@ class LayeredPetalDisplay:
 
         return self.layers
 
-    def draw(self, display: Display):
+    def draw(self, display: Display, frame: int = 0):
         """Draw layers on display."""
         first_layer, *_ = self.layers
 
         for layer in self.layers:
-            layer.draw(display)
+            layer.draw(display, frame=frame)
             layer.decay()
             layer.drop()
             layer.clean_petals()
@@ -297,9 +297,9 @@ def main(
     gust_chance: float = 0.7,
     gust_duration_max: int = 10,
     gust_miss_chance: float = 0.3,
-    gust_strength_max: int = 2,
+    gust_strength_max: int = 3,
     num_of_layers: int = 3,
-    petals_per_bloom_max: int = 1,
+    petals_per_bloom_max: int = 2,
 ):
     speed = 1 / max(frames_per_second, 1)  # Prevent division by zero / negative
 
@@ -332,7 +332,7 @@ def main(
         display.frame(frame, show=False)
         display.fill(0)
 
-        layered_petal_display.draw(display)
+        layered_petal_display.draw(display, frame=frame)
 
         display.frame(frame, show=True)
         sleep(speed)
