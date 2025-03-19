@@ -1,3 +1,3 @@
-from petalbit import main
+from layeredpetalbit import main
 
 main()
