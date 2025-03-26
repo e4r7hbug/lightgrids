@@ -102,16 +102,20 @@ class Petal:
 
         # drift
         if random.random() < 0.1:
-            self.x_drops.pop()
-            self.y_drops.pop()
-            return
+            # self.x_drops.pop()
+            drift_frames = random.randrange(5)
+            self.x_drops = [self.step_size()] * drift_frames + self.x_drops
+            self.y_drops = [0] * drift_frames + self.y_drops
+            # return
 
         self.x = (self.x + self.x_drops.pop()) % self.max_width
         self.y = (self.y + self.y_drops.pop()) % self.max_height
         return self.x, self.y
 
+button_held_x = 1
+button_held_y = 1
 
-max_bright = 50
+max_bright = 7
 
 steps_per_interval = 15
 sleep_time = 1 / steps_per_interval
@@ -130,6 +134,51 @@ petals = [
 
 while True:
     for step in range(steps_per_interval):
+        # A: Add a petal
+        while scroll.is_pressed(scroll.BUTTON_A):
+            petal = Petal(
+                random.randrange(WIDTH),
+                random.randrange(HEIGHT),
+                max_width=WIDTH,
+                max_height=HEIGHT,
+                steps_per_interval=steps_per_interval,
+            )
+            petals.append(petal)
+
+            scroll.clear()
+            scroll.show_text(f"{len(petals)}P", max_bright, 0)
+            scroll.show()
+            time.sleep(0.2)
+
+        # B: Remove a petal
+        while scroll.is_pressed(scroll.BUTTON_B):
+            if petals:
+                petals.pop(0)
+
+            scroll.clear()
+            scroll.show_text(f"{len(petals)}P", max_bright, 0)
+            scroll.show()
+            time.sleep(0.2)
+
+        # X: Brighter
+        if scroll.is_pressed(scroll.BUTTON_X):
+            max_bright = min(max_bright + button_held_x, 255)
+            button_held_x = min(button_held_x + 1, 255)
+            if max_bright >= 255:
+                scroll.clear()
+                scroll.show_text("MAX", 255, 0)
+                scroll.show()
+                time.sleep(0.5)
+        else:
+            button_held_x = 1
+
+        # Y: Dimmer
+        if scroll.is_pressed(scroll.BUTTON_Y):
+            max_bright = max(max_bright - button_held_y, 0)
+            button_held_y = min(button_held_y + 1, 255)
+        else:
+            button_held_y = 1
+
         scroll.clear()
 
         for petal in petals:
