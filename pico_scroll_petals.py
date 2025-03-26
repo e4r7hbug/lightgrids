@@ -135,6 +135,9 @@ while True:
         for petal in petals:
             points = petal.grid()
             for x, y, brightness in points:
+                if not brightness:
+                    continue
+
                 try:
                     scroll.set_pixel(x, y, math.floor(max_bright * brightness))
                 except ValueError as error:
