@@ -120,7 +120,7 @@ num_of_petals = 10
 petals = [
     Petal(
         random.randrange(WIDTH),
-        0,
+        random.randrange(HEIGHT),
         max_width=WIDTH,
         max_height=HEIGHT,
         steps_per_interval=steps_per_interval,
